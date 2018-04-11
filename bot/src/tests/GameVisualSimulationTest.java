@@ -7,9 +7,14 @@ package tests;
 
 import ai.core.AI;
 import ai.RandomBiasedAI;
+import ai.abstraction.HeavyRush;
+import ai.abstraction.LightRush;
+import ai.abstraction.RangedRush;
 import ai.abstraction.WorkerRush;
 import ai.abstraction.pathfinding.BFSPathFinding;
 import ai.mcts.naivemcts.NaiveMCTS;
+import ai.mcts.uct.UCT;
+import ai.portfolio.PortfolioAI;
 import bot.*;
 import gui.PhysicalGameStatePanel;
 import java.io.OutputStreamWriter;
@@ -36,8 +41,8 @@ public class GameVisualSimulationTest {
         boolean gameover = false;
         
         //AI ai1 = new WorkerRush(utt, new BFSPathFinding());
-        AI ai1 = new RandomAI(utt);
-        AI ai2 = new RandomBiasedAI();
+        AI ai1 = new MikasaAI(utt,new BFSPathFinding());
+        AI ai2 = new PortfolioAI(utt);
 
         JFrame w = PhysicalGameStatePanel.newVisualizer(gs,640,640,false,PhysicalGameStatePanel.COLORSCHEME_BLACK);
 //        JFrame w = PhysicalGameStatePanel.newVisualizer(gs,640,640,false,PhysicalGameStatePanel.COLORSCHEME_WHITE);
