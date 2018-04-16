@@ -35,12 +35,6 @@ public class MikasaAI extends AbstractionLayerAI {
     UnitType lightType;
     UnitType rangedType;
 
-    // Strategy implemented by this class:
-    // If we have any "light": send it to attack to the nearest enemy unit
-    // If we have a base: train worker until we have 1 workers
-    // If we have a barracks: train light
-    // If we have a worker: do this if needed: build base, build barracks, harvest resources
-
     public MikasaAI(UnitTypeTable a_utt) {
         this(a_utt, new AStarPathFinding());
     }
