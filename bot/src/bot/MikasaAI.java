@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package bot;
 
 import ai.abstraction.AbstractAction;
@@ -21,10 +17,7 @@ import rts.Player;
 import rts.PlayerAction;
 import rts.units.*;
 
-/**
- *
- * @author santi
- */
+
 public class MikasaAI extends AbstractionLayerAI {
 
     Random r = new Random();
@@ -68,11 +61,11 @@ public class MikasaAI extends AbstractionLayerAI {
     public PlayerAction getAction(int player, GameState gs) {
         PhysicalGameState pgs = gs.getPhysicalGameState();
         Player p = gs.getPlayer(player);
+      //Checks to see map size, will change tactics depending on map size
         int BoardHeight = pgs.getHeight();
         int BoardWidth = pgs.getWidth();
         
-        
-        //Checks to see map size, will change tactics depending on map size
+      
   
         	// behavior of bases:
         	for (Unit u : pgs.getUnits()) {
@@ -338,11 +331,10 @@ public class MikasaAI extends AbstractionLayerAI {
 	                    }
 	                }
 	            }
-	            if(closestEnemyDistance < closestResourceDistance)
+	            if(closestEnemyDistance < 5)
 	            {
 	            	attack(u, closestEnemy);
-	            }
-	            if (closestResource != null && closestBase != null) {
+	            }else if (closestResource != null && closestBase != null) {
 	                AbstractAction aa = getAbstractAction(u);
 	                if (aa instanceof Harvest) {
 	                    Harvest h_aa = (Harvest)aa;
