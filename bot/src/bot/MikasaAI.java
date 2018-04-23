@@ -281,7 +281,7 @@ public class MikasaAI extends AbstractionLayerAI {
 	        }
 	        
 	        List<Integer> reservedPositions = new LinkedList<Integer>();
-	        if (nbases <= 2 && !freeWorkers.isEmpty()) {
+	        if (nbases <= 0 && !freeWorkers.isEmpty()) {
 	            // build a base:
 	            if (p.getResources() >= baseType.cost + resourcesUsed) {
 	                Unit u = freeWorkers.remove(0);
@@ -331,7 +331,7 @@ public class MikasaAI extends AbstractionLayerAI {
 	                    }
 	                }
 	            }
-	            if(closestEnemyDistance < 5)
+	            if(closestEnemyDistance < 3 || closestResource == null)
 	            {
 	            	attack(u, closestEnemy);
 	            }else if (closestResource != null && closestBase != null) {
