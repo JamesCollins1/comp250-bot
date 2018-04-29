@@ -33,7 +33,7 @@ import util.XMLWriter;
 public class GameVisualSimulationTest {
     public static void main(String args[]) throws Exception {
         UnitTypeTable utt = new UnitTypeTable();
-        PhysicalGameState pgs = PhysicalGameState.load("../microrts/maps/NoWhereToRun9x8.xml", utt);
+        PhysicalGameState pgs = PhysicalGameState.load("../microrts/maps/10x10/basesWorkers10x10.xml", utt);
 //        PhysicalGameState pgs = MapGenerator.basesWorkers8x8Obstacle();
 
         GameState gs = new GameState(pgs, utt);
@@ -43,7 +43,7 @@ public class GameVisualSimulationTest {
         
         //AI ai1 = new WorkerRush(utt, new BFSPathFinding());
         AI ai1 = new MikasaAI(utt,new BFSPathFinding());
-        AI ai2 = new PortfolioAI(utt);
+        AI ai2 = new MikasaAI(utt,new BFSPathFinding());
 
         JFrame w = PhysicalGameStatePanel.newVisualizer(gs,640,640,false,PhysicalGameStatePanel.COLORSCHEME_BLACK);
 //        JFrame w = PhysicalGameStatePanel.newVisualizer(gs,640,640,false,PhysicalGameStatePanel.COLORSCHEME_WHITE);

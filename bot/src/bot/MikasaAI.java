@@ -123,14 +123,14 @@ public class MikasaAI extends AbstractionLayerAI {
             }
         }
     	//If the map is big it will do this
-    	if( boardWidth > 10 && boardHeight > 10)
+    	if( boardWidth >= 10 && boardHeight >= 10)
     	{	
 	        //If there are less than 4 workers then we'll train some until we reach 4 workers
 	        if (nworkers < 4 && p.getResources() >= workerType.cost) {
 	            train(u, workerType);
 	        }
 	        //if the map is small it will do this
-    	}else if(boardWidth <= 10 && boardHeight <= 10)										
+    	}else if(boardWidth == 9 && boardHeight == 8)										
     	{
 	        for (Unit u2 : pgs.getUnits()) {
 	            if (u2.getType() == workerType
@@ -141,12 +141,17 @@ public class MikasaAI extends AbstractionLayerAI {
 	        if (nworkers < 3 && p.getResources() >= workerType.cost) {
 	            train(u, workerType);
 	        }
+    	}else
+    	{
+    		if (p.getResources() >= workerType.cost) {
+	            train(u, workerType);
+	        }
     	}
     }
     //Defines the bahaviour for the barracks. We only have barracks on larger maps currently
     public void barracksBehavior(Unit u, Player p, PhysicalGameState pgs, int boardHeight, int boardWidth) {
     	//This check is in incase a strategy with barracks on smaller maps is developed.
-    	if(boardHeight > 10 && boardWidth > 10)
+    	if(boardHeight >= 10 && boardWidth >= 10)
     	{
 	    	int nLight = 0;
 	    	//Gets all my currently trained Light units
@@ -199,15 +204,17 @@ public class MikasaAI extends AbstractionLayerAI {
     	
     	int nbases = 0;
         int nbarracks = 0;
+        
+        //Creates a list for worker units, then assigns our workers list to it
+        List<Unit> freeWorkers = new LinkedList<Unit>();
+        freeWorkers.addAll(workers);
     	//On larger maps it will select the following behaviour
-    	if(boardHeight > 10 && boardWidth >10)
+    	if(boardHeight >= 10 && boardWidth >= 10)
     	{
 	        
 	
 	        int resourcesUsed = 0;
-	        //Creates a list for worker units, then assigns our workers list to it
-	        List<Unit> freeWorkers = new LinkedList<Unit>();
-	        freeWorkers.addAll(workers);
+	        
 	        //If the workers list is empty (We have no workers) then return empty, as we do not need this function to perform anything.
 	        if (workers.isEmpty()) {
 	            return;
@@ -285,13 +292,12 @@ public class MikasaAI extends AbstractionLayerAI {
 	            }
 	        }
 	     //On a small map we will choose this behaviour
-    	}else
+    	}else if(boardHeight == 8 && boardWidth > 8)
     	{
 	       
 	        int resourcesUsed = 0;
-	        //Gets the list of workers as in the above behaviour
-	        List<Unit> freeWorkers = new LinkedList<Unit>();
-	        freeWorkers.addAll(workers);
+	       
+	        
 	        //Checks to see if the list is empty and will break out if it is.
 	        if (workers.isEmpty()) {
 	            return;
@@ -382,9 +388,69 @@ public class MikasaAI extends AbstractionLayerAI {
 	        
 	        }
 	        }
-    	}
-    	
-    }
+    	}else
+    	{
+    		Unit harvestWorker = null;
+    		if(freeWorkers.size() > 1)
+    		{
+    			harvestWorker = freeWorkers.remove(0);
+    		}
+    		for (Unit u : freeWorkers) 
+	        {
+	        	Unit closestEnemy = null;
+	        	int closestEnemyDistance = 0;
+	        	for(Unit u2 : pgs.getUnits())
+	        	{
+	        		if (u2.getPlayer() >= 0 && u2.getPlayer() != p.getID()) {
+	                    int d = Math.abs(u2.getX() - u.getX()) + Math.abs(u2.getY() - u.getY());
+	                    if (closestEnemy == null || d < closestEnemyDistance) {
+	                        closestEnemy = u2;
+	                        closestEnemyDistance = d;
+	                    }
+	                }
+	        	}
+	        	
+    		// harvest with all the free workers:
+	        if(harvestWorker != null) {
+	            Unit closestBase = null;
+	            Unit closestResource = null;
+	            int closestResourceDistance = 0;
+	            for (Unit u2 : pgs.getUnits()) {
+	                if (u2.getType().isResource) {
+	                    int d = Math.abs(u2.getX() - harvestWorker.getX()) + Math.abs(u2.getY() - harvestWorker.getY());
+	                    if (closestResource == null || d < closestResourceDistance) {
+	                        closestResource = u2;
+	                        closestResourceDistance = d;
+	                    }
+	                }
+	            }
+	            closestResourceDistance = 0;
+	            for (Unit u2 : pgs.getUnits()) {
+	                if (u2.getType().isStockpile && u2.getPlayer()==p.getID()) {
+	                    int d = Math.abs(u2.getX() - harvestWorker.getX()) + Math.abs(u2.getY() - harvestWorker.getY());
+	                    if (closestBase == null || d < closestResourceDistance) {
+	                        closestBase = u2;
+	                        closestResourceDistance = d;
+	                    }
+	                }
+	            }
+	            if (closestResource != null && closestBase != null) {
+	                AbstractAction aa = getAbstractAction(u);
+	                if (aa instanceof Harvest) {
+	                    Harvest h_aa = (Harvest)aa;
+	                    if (h_aa.getTarget() != closestResource || h_aa.getBase()!=closestBase) harvest(harvestWorker, closestResource, closestBase);
+	                } else {
+	                    harvest(harvestWorker, closestResource, closestBase);
+	                }
+	            }
+	        }
+	        for (Unit u1 : freeWorkers)
+	        {
+	        	attack(u1, closestEnemy);
+	        }
+        }
+	}
+}
     
     @Override
     public List<ParameterSpecification> getParameters()
